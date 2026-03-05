@@ -1,0 +1,330 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<title>Para ti </title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial, sans-serif;
+}
+
+body{
+height:100vh;
+background:url("foto.jpeg") no-repeat center center/cover;
+overflow:hidden;
+color:white;
+}
+
+/* instrucciones */
+
+#instrucciones{
+position:absolute;
+top:30px;
+width:100%;
+text-align:center;
+font-size:22px;
+font-weight:bold;
+padding:10px;
+}
+
+/* objetos del juego */
+
+.objeto{
+position:absolute;
+font-size:45px;
+cursor:pointer;
+transition:transform .2s;
+}
+
+.objeto:active{
+transform:scale(1.4);
+}
+
+/* explosión */
+
+.explosion{
+position:absolute;
+font-size:30px;
+animation:explode .7s forwards;
+}
+
+@keyframes explode{
+0%{transform:scale(1);opacity:1;}
+100%{transform:scale(3);opacity:0;}
+}
+
+/* pantalla final */
+
+#final{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100vh;
+background:#000;
+display:none;
+justify-content:center;
+align-items:center;
+flex-direction:column;
+text-align:center;
+padding:30px;
+}
+
+#final h2{
+font-size:40px;
+margin-bottom:20px;
+}
+
+#mensajeFinal{
+font-size:28px;
+max-width:600px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="instrucciones">Atrapa a chiqui 5 veces</div>
+
+<div id="final">
+
+<h2></h2>
+
+<div id="mensajeFinal"></div>
+
+</div>
+
+<script>
+
+let puntos=0;
+let correctos=[];
+
+/* utilidades */
+
+function limpiar(){
+document.querySelectorAll(".objeto").forEach(e=>e.remove());
+}
+
+function explotar(el){
+
+let boom=document.createElement("div");
+
+boom.className="explosion";
+boom.innerHTML="💖✨";
+
+boom.style.top=el.style.top;
+boom.style.left=el.style.left;
+
+document.body.appendChild(boom);
+
+el.remove();
+
+setTimeout(()=>boom.remove(),700);
+
+}
+
+/* ---------- JUEGO 1 ---------- */
+
+function juego1(){
+
+puntos=0;
+
+document.getElementById("instrucciones").innerText="Atrapa a chiqui 5 veces";
+
+crearChiqui();
+
+}
+
+function crearChiqui(){
+
+let c=document.createElement("div");
+
+c.className="objeto";
+c.innerHTML="<img src='chiqui.png' style='width:70px'>";
+
+c.style.top=Math.random()*80+"vh";
+c.style.left=Math.random()*90+"vw";
+
+c.onclick=()=>{
+
+puntos++;
+
+explotar(c);
+
+if(puntos>=5){
+
+limpiar();
+
+setTimeout(juego2,800);
+
+}else{
+
+crearChiqui();
+
+}
+
+};
+
+document.body.appendChild(c);
+
+}
+
+/* ---------- JUEGO 2 ---------- */
+
+function juego2(){
+
+puntos=0;
+correctos=[];
+
+document.getElementById("instrucciones").innerText="Memoriza los corazones";
+
+limpiar();
+
+for(let i=0;i<6;i++){
+
+let h=document.createElement("div");
+
+h.className="objeto";
+h.innerHTML="💖";
+
+h.dataset.id=i;
+
+h.style.top=Math.random()*80+"vh";
+h.style.left=Math.random()*90+"vw";
+
+if(correctos.length<3){
+correctos.push(i);
+}
+
+h.onclick=function(){
+
+if(correctos.includes(Number(this.dataset.id))){
+
+this.innerHTML="💖✨";
+
+puntos++;
+
+if(puntos==3){
+
+limpiar();
+
+setTimeout(juego3,800);
+
+}
+
+}else{
+
+this.innerHTML="💔";
+
+}
+
+};
+
+document.body.appendChild(h);
+
+}
+
+setTimeout(()=>{
+
+document.querySelectorAll(".objeto").forEach(h=>{
+h.style.opacity=".4";
+});
+
+document.getElementById("instrucciones").innerText="¿Recuerdas cuáles eran?";
+
+},2000);
+
+}
+
+/* ---------- JUEGO 3 ---------- */
+
+function juego3(){
+
+document.getElementById("instrucciones").innerText="Encuentra el corazón correcto";
+
+limpiar();
+
+let ganador=Math.floor(Math.random()*6);
+
+for(let i=0;i<6;i++){
+
+let h=document.createElement("div");
+
+h.className="objeto";
+h.innerHTML="💖";
+
+h.style.top=Math.random()*80+"vh";
+h.style.left=Math.random()*90+"vw";
+
+if(i==ganador){
+
+h.onclick=()=>{
+
+limpiar();
+pantallaFinal();
+
+};
+
+}else{
+
+h.onclick=()=>explotar(h);
+
+}
+
+document.body.appendChild(h);
+
+}
+
+}
+
+/* ---------- FINAL ---------- */
+
+function pantallaFinal(){
+
+document.getElementById("instrucciones").style.display="none";
+
+let final=document.getElementById("final");
+
+final.style.display="flex";
+
+let mensaje="Mañana iré a visitarte mi amor";
+
+let i=0;
+
+function escribir(){
+
+if(i<mensaje.length){
+
+document.getElementById("mensajeFinal").innerHTML+=mensaje.charAt(i);
+
+i++;
+
+setTimeout(escribir,70);
+
+}
+
+}
+
+escribir();
+
+}
+
+/* iniciar */
+
+juego1();
+
+</script>
+
+</body>
+</html>
+```
